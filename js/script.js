@@ -7,7 +7,6 @@ const modules = [
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    //For home page- Module card filtering
     let cardContainer = document.getElementById('cardContainer');
     let searchInput = document.getElementById('searchInput');
     let yearFilter = document.getElementById('yearFilter');
@@ -23,37 +22,64 @@ document.addEventListener("DOMContentLoaded", function () {
                 categoryTitle.innerText = isDefaultState ? "Popular Categories:" : "Search Results:";
             }
 
-            let html = "";
-            let matchCount = 0;
+            let displayModules = [];
 
-            modules.forEach(function (mod) {
-                let y = mod[0], code = mod[1], name = mod[2], isPopular = mod[3];
-                let matchYear = (selectedYear === "All" || selectedYear == y);
-                let matchSearch = code.toLowerCase().includes(searchText) || name.toLowerCase().includes(searchText);
-                let shouldShow = false;
+            if (isDefaultState) {
+                let recentCodes = (window.RECENT_MODULE_CODES && Array.isArray(window.RECENT_MODULE_CODES)) 
+                    ? window.RECENT_MODULE_CODES 
+                    : [];
 
-                if (isDefaultState) {
-                    if (isPopular === 1) shouldShow = true;
+                if (recentCodes.length > 0) {
+                    recentCodes.forEach(function (code) {
+                        let cleanCode = code.replace(/\s+/g, '').toUpperCase();
+                        let found = modules.find(function (m) {
+                            return m[1].replace(/\s+/g, '').toUpperCase() === cleanCode;
+                        });
+                        if (found && !displayModules.includes(found)) {
+                            displayModules.push(found);
+                        }
+                    });
+
+                    modules.forEach(function (mod) {
+                        if (mod[3] === 1 && !displayModules.includes(mod)) {
+                            displayModules.push(mod);
+                        }
+                    });
                 } else {
-                    if (matchYear && matchSearch) shouldShow = true;
+                    displayModules = modules.filter(function (mod) {
+                        return mod[3] === 1;
+                    });
                 }
+            } else {
+                displayModules = modules.filter(function (mod) {
+                    let y = mod[0], code = mod[1], name = mod[2];
+                    let matchYear = (selectedYear === "All" || selectedYear == y);
+                    let matchSearch = code.toLowerCase().includes(searchText) || name.toLowerCase().includes(searchText);
+                    return matchYear && matchSearch;
+                });
+            }
 
-                if (shouldShow) {
-                    matchCount++;
-                    html += `
-                    <div class="col-md-4 mb-3 module-card">
-                        <div class="card glass-element glass-card rounded h-100 p-2">
-                            <div class="card-body">
-                                <h5 class="card-title fw-bold">${code}</h5>
-                                <p class="card-text fw-semibold">${name}</p>
-                                <a href="view-notes.php?code=${code}&name=${name}" class="btn btn-sm text-white" style="background-color: #967bb6;">View Notes ▼</a>
-                            </div>
+            let html = "";
+            displayModules.forEach(function (mod) {
+                let code = mod[1], name = mod[2];
+
+                let viewButtonHtml = (typeof window.IS_LOGGED_IN !== 'undefined' && window.IS_LOGGED_IN)
+                    ? `<a href="view-notes.php?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}" class="btn btn-sm text-white" style="background-color: #967bb6;">View Notes ▼</a>`
+                    : `<button type="button" onclick="showLoginAlert('view')" class="btn btn-sm text-white" style="background-color: #967bb6;">View Notes ▼</button>`;
+
+                html += `
+                <div class="col-md-4 mb-3 module-card">
+                    <div class="card glass-element glass-card rounded h-100 p-2">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">${code}</h5>
+                            <p class="card-text fw-semibold">${name}</p>
+                            ${viewButtonHtml}
                         </div>
-                    </div>`;
-                }
+                    </div>
+                </div>`;
             });
 
-            if (matchCount === 0) {
+            if (displayModules.length === 0) {
                 html = `<div class="col-12 text-center text-muted mt-4"><p>No modules found for your search.</p></div>`;
             }
 
@@ -65,10 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
         yearFilter.addEventListener('change', renderCards);
     }
 
-
-    //Drop down filtering
     let selectElement = document.getElementById("categorySelect");
-
     if (selectElement) {
         modules.forEach(function (mod) {
             let code = mod[1];
@@ -82,5 +105,4 @@ document.addEventListener("DOMContentLoaded", function () {
             selectElement.insertBefore(option, selectElement.lastElementChild);
         });
     }
-
 });

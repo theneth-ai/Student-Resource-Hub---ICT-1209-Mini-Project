@@ -1,5 +1,23 @@
 <?php
 session_start();
+require_once 'includes/db.php';
+
+$recentSubjectCodes = [];
+if (isset($pdo)) {
+    try {
+        $stmt = $pdo->query("SELECT subject FROM notes ORDER BY id DESC LIMIT 10");
+        $subjects = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($subjects as $s) {
+            if (preg_match('/[A-Za-z]{3}\s*\d{4}/', $s, $match)) {
+                $code = strtoupper(preg_replace('/\s+/', ' ', trim($match[0])));
+                if (!in_array($code, $recentSubjectCodes)) {
+                    $recentSubjectCodes[] = $code;
+                }
+            }
+        }
+    } catch (Exception $e) {
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,8 +28,8 @@ session_start();
     <title>Xnotes - The BICT Resource Hub</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
     <link rel="stylesheet" href="css/style.css?v=1.2">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -88,10 +106,18 @@ session_start();
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h4 class="mb-0 fw-bold" id="categoryTitle">Popular Categories:</h4>
             <div class="d-flex align-items-center gap-3">
-                <a href="upload.php"
-                    class="glass-btn shadow-sm text-dark fw-semibold text-decoration-none d-flex align-items-center justify-content-center gap-2">
-                    <i class="bi bi-paperclip" style="font-size: 1.25rem;"></i> Add Note
-                </a>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="upload.php"
+                        class="glass-btn shadow-sm text-dark fw-semibold text-decoration-none d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-paperclip" style="font-size: 1.25rem;"></i> Add Note
+                    </a>
+                <?php else: ?>
+                    <button type="button" onclick="showLoginAlert('upload')"
+                        class="glass-btn shadow-sm text-dark fw-semibold text-decoration-none d-flex align-items-center justify-content-center gap-2 border-0">
+                        <i class="bi bi-paperclip" style="font-size: 1.25rem;"></i> Add Note
+                    </button>
+                <?php endif; ?>
+
                 <div class="position-relative d-flex align-items-center">
                     <select id="yearFilter" class="glass-btn shadow-sm text-dark fw-semibold m-0"
                         style="appearance: none; -webkit-appearance: none; outline: none; padding-right: 2.5rem; width: 120px;">
@@ -116,6 +142,31 @@ session_start();
         </div>
     </footer>
 
+    <script>
+        window.IS_LOGGED_IN = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
+        window.RECENT_MODULE_CODES = <?php echo json_encode($recentSubjectCodes); ?>;
+
+        function showLoginAlert(action = 'view') {
+            const message = action === 'upload' 
+                ? 'Please login with your university account to upload lecture notes!' 
+                : 'Please login with your university account to view or download notes!';
+
+            Swal.fire({
+                icon: 'info',
+                title: 'Login Required',
+                text: message,
+                showCancelButton: true,
+                confirmButtonText: 'Login Now',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#967bb6',
+                cancelButtonColor: '#6c757d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'auth/login.php';
+                }
+            });
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/script.js"></script>
 

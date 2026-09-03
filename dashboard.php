@@ -169,6 +169,8 @@ $notes = $stmt->fetchAll();
                         <?php if (count($notes) > 0): ?>
                             <?php foreach ($notes as $note): 
                                 $fileExt = strtolower(pathinfo($note['file_path'], PATHINFO_EXTENSION));
+                                // ආරක්ෂිත File URL එක සෑදීම
+                                $secureFileUrl = 'view-file.php?file=' . urlencode(basename($note['file_path']));
                             ?>
                                 <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3 px-0 border-bottom">
                                     <div>
@@ -180,11 +182,11 @@ $notes = $stmt->fetchAll();
                                         <?php if ($fileExt === 'pdf'): ?>
                                             <button type="button" 
                                                 class="btn btn-sm btn-outline-dark rounded-pill px-3 shadow-sm fw-semibold"
-                                                onclick="openViewer('<?php echo htmlspecialchars($note['file_path']); ?>', '<?php echo htmlspecialchars(addslashes($note['title'])); ?>')">
+                                                onclick="openViewer('<?php echo $secureFileUrl; ?>', '<?php echo htmlspecialchars(addslashes($note['title'])); ?>')">
                                                 <i class="bi bi-eye"></i> View
                                             </button>
                                         <?php else: ?>
-                                            <a href="<?php echo htmlspecialchars($note['file_path']); ?>" download class="btn btn-sm btn-outline-dark rounded-pill px-3 shadow-sm fw-semibold">
+                                            <a href="<?php echo $secureFileUrl; ?>" download class="btn btn-sm btn-outline-dark rounded-pill px-3 shadow-sm fw-semibold">
                                                 <i class="bi bi-download"></i> Get
                                             </a>
                                         <?php endif; ?>
@@ -297,7 +299,7 @@ $notes = $stmt->fetchAll();
         const viewerModal = new bootstrap.Modal(document.getElementById('pdfViewerModal'));
         function openViewer(filePath, title) {
             document.getElementById('pdfModalTitle').innerText = title;
-            document.getElementById('pdfFrame').src = filePath + '#toolbar=1';
+            document.getElementById('pdfFrame').src = filePath + '&toolbar=1';
             viewerModal.show();
         }
 

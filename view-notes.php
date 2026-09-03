@@ -1,5 +1,12 @@
 <?php
 session_start();
+
+// User login 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: auth/login.php?error=login_required");
+    exit();
+}
+
 require_once 'includes/db.php';
 
 $module_code = $_GET['code'] ?? '';
@@ -104,6 +111,9 @@ if (!empty($module_code)) {
 
                     $fileSize = file_exists($note['file_path']) ? round(filesize($note['file_path']) / (1024 * 1024), 2) . ' MB' : 'N/A';
                     $uploadDate = date('Y-m-d', strtotime($note['uploaded_at']));
+                    
+                   
+                    $secureFileUrl = 'view-file.php?file=' . urlencode(basename($note['file_path']));
                 ?>
                     <div class="col-12 mb-3">
                         <div class="card glass-element glass-card p-3 border-0">
@@ -119,11 +129,11 @@ if (!empty($module_code)) {
                                     <?php if ($fileExt === 'pdf'): ?>
                                         <button type="button" 
                                             class="btn btn-outline-dark rounded-pill px-4 shadow-sm fw-semibold"
-                                            onclick="openViewer('<?php echo htmlspecialchars($note['file_path']); ?>', '<?php echo htmlspecialchars(addslashes($note['title'])); ?>')">
+                                            onclick="openViewer('<?php echo $secureFileUrl; ?>', '<?php echo htmlspecialchars(addslashes($note['title'])); ?>')">
                                             <i class="bi bi-eye me-1"></i> View
                                         </button>
                                     <?php endif; ?>
-                                    <a href="<?php echo htmlspecialchars($note['file_path']); ?>" download class="btn btn-theme px-4 shadow-sm">
+                                    <a href="<?php echo $secureFileUrl; ?>" download class="btn btn-theme px-4 shadow-sm">
                                         <i class="bi bi-download me-1"></i> Download
                                     </a>
                                 </div>
@@ -171,7 +181,7 @@ if (!empty($module_code)) {
         const viewerModal = new bootstrap.Modal(document.getElementById('pdfViewerModal'));
         function openViewer(filePath, title) {
             document.getElementById('pdfModalTitle').innerText = title;
-            document.getElementById('pdfFrame').src = filePath + '#toolbar=1';
+            document.getElementById('pdfFrame').src = filePath + '&toolbar=1';
             viewerModal.show();
         }
 
