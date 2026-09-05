@@ -169,7 +169,7 @@ $notes = $stmt->fetchAll();
                         <?php if (count($notes) > 0): ?>
                             <?php foreach ($notes as $note): 
                                 $fileExt = strtolower(pathinfo($note['file_path'], PATHINFO_EXTENSION));
-                                // ආරක්ෂිත File URL එක සෑදීම
+                                // Create secured file url...
                                 $secureFileUrl = 'view-file.php?file=' . urlencode(basename($note['file_path']));
                             ?>
                                 <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-3 px-0 border-bottom">

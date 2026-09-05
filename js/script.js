@@ -25,8 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
             let displayModules = [];
 
             if (isDefaultState) {
-                let recentCodes = (window.RECENT_MODULE_CODES && Array.isArray(window.RECENT_MODULE_CODES)) 
-                    ? window.RECENT_MODULE_CODES 
+                let recentCodes = (window.RECENT_MODULE_CODES && Array.isArray(window.RECENT_MODULE_CODES))
+                    ? window.RECENT_MODULE_CODES
                     : [];
 
                 if (recentCodes.length > 0) {
@@ -64,8 +64,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 let code = mod[1], name = mod[2];
 
                 let viewButtonHtml = (typeof window.IS_LOGGED_IN !== 'undefined' && window.IS_LOGGED_IN)
-                    ? `<a href="view-notes.php?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}" class="btn btn-sm text-white" style="background-color: #967bb6;">View Notes ▼</a>`
-                    : `<button type="button" onclick="showLoginAlert('view')" class="btn btn-sm text-white" style="background-color: #967bb6;">View Notes ▼</button>`;
+                    ? `<a href="view-notes.php?code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}" class="btn btn-sm text-white px-3 shadow-sm" style="background-color: #967bb6;">View & Download ▼</a>`
+                    : `<button type="button" onclick="showLoginAlert('view')" class="btn btn-sm text-white px-3 shadow-sm" style="background-color: #967bb6;">View & Download ▼</button>`;
 
                 html += `
                 <div class="col-md-4 mb-3 module-card">

@@ -9,9 +9,15 @@ require '../includes/PHPMailer/Exception.php';
 require '../includes/PHPMailer/PHPMailer.php';
 require '../includes/PHPMailer/SMTP.php';
 
+// [SECURITY NOTICE FOR EXAMINER]
+// The Gmail App Password has been intentionally removed from this code 
+// before pushing to GitHub for security and privacy reasons.
 
-define('SMTP_USER', 'pasindur91@gmail.com');
-define('SMTP_PASS', ''); 
+// To test the OTP email functionality, please enter a valid 16-character 
+// Gmail App Password below, or configure it with a local testing server.
+
+define('SMTP_USER', 'example@gmail.com'); // You can change this to your email
+define('SMTP_PASS', ''); // Enter your App Password here to test
 
 
 $alertType = '';

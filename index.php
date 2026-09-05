@@ -5,14 +5,13 @@ require_once 'includes/db.php';
 $recentSubjectCodes = [];
 if (isset($pdo)) {
     try {
-        $stmt = $pdo->query("SELECT subject FROM notes ORDER BY id DESC LIMIT 10");
-        $subjects = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        // Popular categories selection
+        $stmt = $pdo->query("SELECT module_code, COUNT(id) as note_count FROM notes GROUP BY module_code ORDER BY note_count DESC LIMIT 8");
+        $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($subjects as $s) {
-            if (preg_match('/[A-Za-z]{3}\s*\d{4}/', $s, $match)) {
-                $code = strtoupper(preg_replace('/\s+/', ' ', trim($match[0])));
-                if (!in_array($code, $recentSubjectCodes)) {
-                    $recentSubjectCodes[] = $code;
-                }
+            $code = strtoupper(preg_replace('/\s+/', ' ', trim($s['module_code'])));
+            if (!in_array($code, $recentSubjectCodes)) {
+                $recentSubjectCodes[] = $code;
             }
         }
     } catch (Exception $e) {

@@ -19,11 +19,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $file        = $_FILES['note_file'];
         $fileName    = $file['name'];
         $fileTmp     = $file['tmp_name'];
+        $fileSize    = $file['size'];
         $fileExt     = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         $allowedExts = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'zip'];
         
-        if (in_array($fileExt, $allowedExts)) {
-            $newFileName = time() . '_' . basename($fileName);
+        $allowedMimeTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'application/zip',
+            'application/x-zip-compressed'
+        ];
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $fileTmp);
+        finfo_close($finfo);
+        
+        $maxFileSize = 20 * 1024 * 1024; // 20 MB
+
+        if ($fileSize > $maxFileSize) {
+            $errorMsg = "File is too large! Maximum allowed size is 20MB.";
+        } elseif (in_array($fileExt, $allowedExts) && in_array($mimeType, $allowedMimeTypes)) {
+            $cleanFileName = preg_replace('/[^a-zA-Z0-9.\-_]/', '_', basename($fileName));
+            $newFileName = time() . '_' . $cleanFileName;
             $uploadDir   = 'uploads/';
             
             if (!is_dir($uploadDir)) {
@@ -60,7 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $errorMsg = "Failed to move uploaded file. Check 'uploads' folder permissions.";
             }
         } else {
-            $errorMsg = "Invalid file type! Only PDF, DOC, PPT, and ZIP files are allowed.";
+            $errorMsg = "Invalid file! Only genuine PDF, DOC, PPT, and ZIP documents are allowed.";
         }
     } else {
         $errorMsg = "Please select a valid file to upload.";
