@@ -152,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="alert alert-danger text-center fw-bold"><?php echo htmlspecialchars($errorMsg); ?></div>
             <?php endif; ?>
 
-            <form action="" method="POST" enctype="multipart/form-data">
+            <form id="uploadForm" action="" method="POST" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Note Title</label>
                     <input type="text" class="form-control form-control-lg rounded-pill" name="title" placeholder="E.g. Web Tech Chapter 1" required>
@@ -218,6 +218,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display.style.color = '#333';
             display.style.fontWeight = '500';
         });
+                // File Upload Loading Bar Script
+        const uploadForm = document.getElementById('uploadForm');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function() {
+                const fileInput = document.getElementById('noteFileInput');
+                
+                // Check wheather a file is selected and show the loading bar
+                if (fileInput.files.length > 0) {
+                    Swal.fire({
+                        title: 'Uploading Note...',
+                        html: 'Please wait while your file is being uploaded.<br><b>Do not close this page.</b>',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                }
+            });
+        }
     </script>
 </body>
 </html>

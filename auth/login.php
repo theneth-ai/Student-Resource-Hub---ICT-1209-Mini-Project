@@ -5,6 +5,11 @@ require_once '../includes/db.php';
 
 $error = '';
 
+if (isset($_SESSION['user_id'])) {
+    header("Location: ../dashboard.php");
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -19,6 +24,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['email'] = $user['email'];
+
+        // Remember Me Code
+        if (isset($_POST['remember_me'])) {
+            $token = bin2hex(random_bytes(32));
+            setcookie('remember_me', $token, time() + (86400 * 30), "/"); // 30 days validity
+            $updateStmt = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
+            $updateStmt->execute([$token, $user['id']]);
+        }
         
         header("Location: ../dashboard.php");
         exit();
@@ -101,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="form-check">
-                            <input type="checkbox" class="form-check-input shadow-sm" id="rememberMe">
+                            <input type="checkbox" class="form-check-input shadow-sm" id="rememberMe" name="remember_me">
                             <label class="form-check-label fw-medium" for="rememberMe">Remember me</label>
                         </div>
                         <a href="forgot-password.php" class="text-theme text-decoration-none fw-semibold">Forgot Password?</a>

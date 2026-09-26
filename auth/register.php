@@ -16,8 +16,8 @@ require '../includes/PHPMailer/SMTP.php';
 // To test the OTP email functionality, please enter a valid 16-character 
 // Gmail App Password below, or configure it with a local testing server.
 
-define('SMTP_USER', ''); // You can change this to your email
-define('SMTP_PASS', ''); // Enter your App Password here to test
+define('SMTP_USER', 'thenethdulshan@gmail.com'); // You can change this to your email
+define('SMTP_PASS', 'jypp rikm losu xcom'); // Enter your App Password here to test
 
 $error = '';
 $success = '';
