@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $message = trim($_POST['message']);
 
     if (strpos($email, '@tec.rjt.ac.lk') !== false) { 
-        $sql = "INSERT INTO message (name, email, message) VALUES (?, ?, ?)"; 
+        $sql = "INSERT INTO messages (name, email, message) VALUES (?, ?, ?)"; 
         $stmt = $pdo->prepare($sql);
         
         if ($stmt->execute([$name, $email, $message])) {
