@@ -132,7 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <footer class="glass-element py-4 mt-auto">
         <div class="container text-center text-dark fw-medium">
-            &copy; 2026 Xnotes | Rajarata University BICT
+            &copy; 2026 Xnotes | The BICT Resource Hub<br>Faculty of Technology, Rajarata University of Sri Lanka. All Rights Reserved.
         </div>
     </footer>
 
